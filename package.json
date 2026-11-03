@@ -1,0 +1,15 @@
+{
+  "name": "mini-erp",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:db": "docker compose up -d db redis",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:worker": "npm run worker -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "test": "npm test -w apps/api",
+    "typecheck": "npm run typecheck --workspaces"
+  }
+}
