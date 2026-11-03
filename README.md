@@ -4,6 +4,8 @@ Internal app for a workshop that manufactures laser-cut gates and fences: produc
 
 The UI is in Romanian, since the target users are a Romanian business.
 
+![Dashboard](docs/screenshots/dashboard.png)
+
 **Stack:** Node.js · Express 5 · Prisma 7 · PostgreSQL · Next.js 16 · React 19 · TanStack Query · Tailwind 4 · BullMQ + Redis · Zod · Vitest + Supertest · Docker · GitHub Actions
 
 ```
@@ -11,6 +13,18 @@ apps/
   api/   Express + Prisma (REST, authentication, roles, background jobs)
   web/   Next.js (UI)
 ```
+
+## Screenshots
+
+| Orders | Stock ledger |
+|---|---|
+| ![Orders list with status filters](docs/screenshots/orders.png) | ![Stock movements, low-stock alerts and a receipt form](docs/screenshots/stock.png) |
+
+<p>
+  <img src="docs/screenshots/dashboard-mobile.png" alt="Dashboard on a phone" width="300">
+</p>
+
+Design direction (flat style, slate + emerald palette, Fira Sans / Fira Code) generated with the [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) design-system skill.
 
 ## Quick start
 
