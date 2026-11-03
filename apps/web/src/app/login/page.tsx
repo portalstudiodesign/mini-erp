@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { Me } from "@/lib/types";
-import { Button, ErrorBox, Field, Input } from "@/components/ui";
+import { Button, ErrorBox, Field, Input, Logo } from "@/components/ui";
 
 const DEMO_ACCOUNTS = [
   { email: "admin@demo.ro", label: "Administrator" },
@@ -44,12 +44,12 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-3 grid size-10 place-items-center rounded-lg bg-brand-600 text-lg font-bold text-white">M</div>
+        <Logo className="mx-auto mb-3 size-10 text-lg" />
         <h1 className="text-xl font-semibold">Mini ERP</h1>
-        <p className="mt-1 text-sm text-zinc-500">Comenzi, stocuri și clienți</p>
+        <p className="mt-1 text-sm text-slate-500">Comenzi, stocuri și clienți</p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-xs">
+      <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-6">
         <Field label="Email">
           <Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
@@ -62,8 +62,8 @@ function LoginForm() {
         </Button>
       </form>
 
-      <div className="mt-6 rounded-lg border border-dashed border-zinc-300 p-4">
-        <p className="mb-3 text-xs text-zinc-500">Conturi demo (parola Demo1234!). Fiecare rol vede alte acțiuni:</p>
+      <div className="mt-6 rounded-lg border border-dashed border-slate-300 p-4">
+        <p className="mb-3 text-xs text-slate-500">Conturi demo (parola Demo1234!). Fiecare rol vede alte acțiuni:</p>
         <div className="grid grid-cols-3 gap-2">
           {DEMO_ACCOUNTS.map((a) => (
             <Button key={a.email} variant="secondary" disabled={pending} onClick={() => void login({ email: a.email, password: "Demo1234!" })}>

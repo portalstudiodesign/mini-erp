@@ -93,7 +93,7 @@ export default function CustomersPage() {
         action={canWrite && <Button onClick={() => setEditing("new")}>Client nou</Button>}
       />
       <Card>
-        <div className="border-b border-zinc-100 p-4">
+        <div className="border-b border-slate-100 p-4">
           <Input
             placeholder="Caută după nume, CUI sau email…"
             value={q}
@@ -118,11 +118,11 @@ export default function CustomersPage() {
           <tbody>
             {data?.items.length === 0 && <EmptyRow colSpan={5}>Niciun client găsit.</EmptyRow>}
             {data?.items.map((c) => (
-              <tr key={c.id} onClick={() => canWrite && setEditing(c)} className={canWrite ? "cursor-pointer hover:bg-zinc-50" : undefined}>
+              <tr key={c.id} onClick={() => canWrite && setEditing(c)} className={canWrite ? "cursor-pointer hover:bg-slate-50" : undefined}>
                 <Td className="font-medium">{c.name}</Td>
-                <Td className="font-mono text-xs text-zinc-600">{c.taxId ?? "—"}</Td>
+                <Td className="font-mono text-xs text-slate-600">{c.taxId ?? "—"}</Td>
                 <Td>{c.city ?? "—"}</Td>
-                <Td className="text-zinc-600">{c.email ?? c.phone ?? "—"}</Td>
+                <Td className="text-slate-600">{c.email ?? c.phone ?? "—"}</Td>
                 <Td className="tabular text-right">{c._count?.orders ?? 0}</Td>
               </tr>
             ))}

@@ -4,7 +4,13 @@ const money = new Intl.NumberFormat("ro-RO", { style: "currency", currency: "RON
 const dateTime = new Intl.DateTimeFormat("ro-RO", { dateStyle: "medium", timeStyle: "short" });
 const date = new Intl.DateTimeFormat("ro-RO", { day: "numeric", month: "short" });
 
+const amount = new Intl.NumberFormat("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const compact = new Intl.NumberFormat("ro-RO", { notation: "compact", maximumFractionDigits: 1 });
+
 export const formatMoney = (value: string | number) => money.format(Number(value));
+/** Suma fără monedă, pentru afișări unde „RON” e pus separat, mai mic. */
+export const formatAmount = (value: string | number) => amount.format(Number(value));
+export const formatCompact = (value: number) => compact.format(value);
 export const formatDateTime = (value: string) => dateTime.format(new Date(value));
 export const formatDay = (value: string) => date.format(new Date(value));
 
