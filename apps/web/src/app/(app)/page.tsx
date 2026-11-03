@@ -72,9 +72,14 @@ function Kpi({
         {value}
         {unit && <span className="ml-1 text-sm font-medium text-slate-400">{unit}</span>}
       </div>
-      <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+      <div className="mt-1 text-xs text-slate-500">
         {hint}
-        {href && <ArrowRight className="size-3.5 motion-safe:transition-transform group-hover:translate-x-0.5" aria-hidden />}
+        {href && (
+          <ArrowRight
+            className="ml-1 inline-block size-3.5 align-[-3px] motion-safe:transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        )}
       </div>
     </>
   );
@@ -114,8 +119,8 @@ function RevenueChart({ data }: { data: Dashboard["revenueByDay"] }) {
 
   return (
     <div className="p-4">
-      <dl className="grid grid-cols-3 gap-3 border-b border-slate-100 pb-4">
-        <Stat label="Total 14 zile" value={formatAmount(total)} unit="RON" />
+      <dl className="grid grid-cols-2 gap-3 border-b border-slate-100 pb-4 sm:grid-cols-3">
+        <Stat label="Total 14 zile" value={formatAmount(total)} unit="RON" className="col-span-2 sm:col-span-1" />
         <Stat label="Comenzi" value={orders} />
         <Stat label="Cea mai bună zi" value={best.total ? formatDay(best.date) : "—"} />
       </dl>
@@ -209,9 +214,9 @@ function RevenueChart({ data }: { data: Dashboard["revenueByDay"] }) {
   );
 }
 
-function Stat({ label, value, unit }: { label: string; value: ReactNode; unit?: string }) {
+function Stat({ label, value, unit, className = "" }: { label: string; value: ReactNode; unit?: string; className?: string }) {
   return (
-    <div className="min-w-0">
+    <div className={`min-w-0 ${className}`}>
       <dt className="truncate text-xs text-slate-500">{label}</dt>
       <dd className="mt-0.5 truncate font-mono text-sm font-semibold tabular sm:text-base">
         {value}
@@ -286,7 +291,7 @@ function Skeleton() {
     <div className="space-y-6" aria-busy aria-label="Se încarcă panoul">
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className={`h-[124px] ${block} ${i === 0 ? "col-span-2 sm:col-span-1" : ""}`} />
+          <div key={i} className={`h-[124px] ${block} ${i === 0 || i === 3 ? "col-span-2 sm:col-span-1" : ""}`} />
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
@@ -360,6 +365,7 @@ export default function DashboardPage() {
               hint={alerts ? "sub stocul minim" : "stoc în regulă"}
               href="/stoc"
               tone={alerts ? "danger" : "neutral"}
+              className="col-span-2 sm:col-span-1"
             />
           </div>
 
