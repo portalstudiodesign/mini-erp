@@ -3,7 +3,7 @@ import { env } from "./config/env.js";
 import { checkLowStock } from "./jobs/lowStock.js";
 import { logger } from "./lib/logger.js";
 import { prisma } from "./lib/prisma.js";
-import { createRedisConnection, getStockQueue, STOCK_QUEUE, type LowStockJob } from "./lib/queue.js";
+import { closeQueue, createRedisConnection, getStockQueue, STOCK_QUEUE, type LowStockJob } from "./lib/queue.js";
 
 if (!env.REDIS_URL) {
   logger.error("Workerul are nevoie de REDIS_URL");
@@ -17,11 +17,12 @@ await getStockQueue()!.upsertJobScheduler(
   { name: "low-stock-check", data: { productIds: "all" } },
 );
 
+const connection = createRedisConnection(env.REDIS_URL);
 const worker = new Worker<LowStockJob>(
   STOCK_QUEUE,
   async (job) => checkLowStock(job.data.productIds),
   // Jobul e sigur la rulări paralele (vezi StockAlert.openFor), deci putem procesa mai multe deodată.
-  { connection: createRedisConnection(env.REDIS_URL), concurrency: 5 },
+  { connection, concurrency: 5 },
 );
 
 worker.on("completed", (job, result) => logger.debug({ jobId: job.id, result }, "Job finalizat"));
@@ -30,7 +31,7 @@ logger.info(`Worker pornit pe coada "${STOCK_QUEUE}"`);
 
 async function shutdown() {
   await worker.close();
-  await prisma.$disconnect();
+  await Promise.allSettled([connection.quit(), closeQueue(), prisma.$disconnect()]);
   process.exit(0);
 }
 process.on("SIGTERM", () => void shutdown());

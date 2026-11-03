@@ -17,10 +17,13 @@ export function createRedisConnection(url: string) {
 }
 
 let queue: Queue<LowStockJob> | undefined;
+// BullMQ nu închide o conexiune primită din afară, deci o păstrăm ca s-o închidem noi în closeQueue().
+let connection: Redis | undefined;
 
 export function getStockQueue(): Queue<LowStockJob> | undefined {
   if (!env.REDIS_URL) return undefined;
-  queue ??= new Queue<LowStockJob>(STOCK_QUEUE, { connection: createRedisConnection(env.REDIS_URL) });
+  connection ??= createRedisConnection(env.REDIS_URL);
+  queue ??= new Queue<LowStockJob>(STOCK_QUEUE, { connection });
   return queue;
 }
 
@@ -50,6 +53,10 @@ export async function enqueueLowStockCheck(productIds: number[]) {
   }
 }
 
+/** Închide coada și conexiunea ei Redis; altfel procesul (ex. seed-ul) nu se mai termină. */
 export async function closeQueue() {
   await queue?.close();
+  await connection?.quit();
+  queue = undefined;
+  connection = undefined;
 }
