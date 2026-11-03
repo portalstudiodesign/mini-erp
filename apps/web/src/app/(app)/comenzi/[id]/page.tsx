@@ -28,12 +28,12 @@ export default function OrderPage() {
   }
 
   if (error) return <ErrorBox error={error} />;
-  if (!order) return <p className="text-sm text-zinc-500">Se încarcă…</p>;
+  if (!order) return <p className="text-sm text-slate-500">Se încarcă…</p>;
 
   return (
     <>
       <div className="mb-2 text-sm">
-        <Link href="/comenzi" className="text-zinc-500 hover:text-zinc-800">
+        <Link href="/comenzi" className="text-slate-500 hover:text-slate-800">
           ← Comenzi
         </Link>
       </div>
@@ -44,8 +44,8 @@ export default function OrderPage() {
       />
 
       {order.allowedTransitions.length > 0 && (
-        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-zinc-200 bg-white p-3">
-          <span className="mr-2 text-sm text-zinc-600">Acțiuni:</span>
+        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-white p-3">
+          <span className="mr-2 text-sm text-slate-600">Acțiuni:</span>
           {order.allowedTransitions.map((status) => (
             <Button
               key={status}
@@ -78,7 +78,7 @@ export default function OrderPage() {
                 <tr key={item.id}>
                   <Td>
                     <div className="font-medium">{item.product.name}</div>
-                    <div className="font-mono text-xs text-zinc-500">
+                    <div className="font-mono text-xs text-slate-500">
                       {item.product.sku} · în stoc: {item.product.stock} {item.product.unit}
                     </div>
                   </Td>
@@ -92,7 +92,7 @@ export default function OrderPage() {
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={3} className="px-4 py-3 text-right text-sm text-zinc-600">
+                <td colSpan={3} className="px-4 py-3 text-right text-sm text-slate-600">
                   Total (fără TVA)
                 </td>
                 <td className="tabular px-4 py-3 text-right text-base font-semibold">{formatMoney(order.total)}</td>
@@ -105,26 +105,26 @@ export default function OrderPage() {
           <Card title="Client">
             <dl className="space-y-1 p-4 text-sm">
               <dt className="font-medium">{order.customer.name}</dt>
-              {order.customer.taxId && <dd className="font-mono text-xs text-zinc-500">{order.customer.taxId}</dd>}
-              {order.customer.city && <dd className="text-zinc-600">{order.customer.city}</dd>}
-              {order.customer.email && <dd className="text-zinc-600">{order.customer.email}</dd>}
-              {order.customer.phone && <dd className="text-zinc-600">{order.customer.phone}</dd>}
+              {order.customer.taxId && <dd className="font-mono text-xs text-slate-500">{order.customer.taxId}</dd>}
+              {order.customer.city && <dd className="text-slate-600">{order.customer.city}</dd>}
+              {order.customer.email && <dd className="text-slate-600">{order.customer.email}</dd>}
+              {order.customer.phone && <dd className="text-slate-600">{order.customer.phone}</dd>}
             </dl>
           </Card>
           {order.notes && (
             <Card title="Observații">
-              <p className="p-4 text-sm text-zinc-700">{order.notes}</p>
+              <p className="p-4 text-sm text-slate-700">{order.notes}</p>
             </Card>
           )}
           <Card title="Mișcări de stoc">
             {order.movements.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">Stocul nu a fost atins. Se rezervă la confirmare.</p>
+              <p className="p-4 text-sm text-slate-500">Stocul nu a fost atins. Se rezervă la confirmare.</p>
             ) : (
-              <ul className="divide-y divide-zinc-100 text-sm">
+              <ul className="divide-y divide-slate-100 text-sm">
                 {order.movements.map((m) => (
                   <li key={m.id} className="flex justify-between gap-2 px-4 py-2">
                     <span>
-                      {MOVEMENT_LABEL[m.type]} <span className="text-zinc-500">· {m.user.name}</span>
+                      {MOVEMENT_LABEL[m.type]} <span className="text-slate-500">· {m.user.name}</span>
                     </span>
                     <span className={`tabular ${m.quantity < 0 ? "text-red-600" : "text-emerald-700"}`}>
                       {m.quantity > 0 ? "+" : ""}

@@ -45,7 +45,7 @@ function Orders() {
         }
       />
       <Card>
-        <div className="flex flex-wrap items-center gap-3 border-b border-zinc-100 p-4">
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 p-4">
           <div className="flex flex-wrap gap-1">
             {TABS.map((tab) => {
               const active = (tab === "ALL" && !status) || tab === status;
@@ -53,7 +53,7 @@ function Orders() {
                 <button
                   key={tab}
                   onClick={() => selectTab(tab)}
-                  className={`rounded-md px-3 py-1.5 text-sm ${active ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-100"}`}
+                  className={`rounded-md px-3 py-1.5 text-sm ${active ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"}`}
                 >
                   {tab === "ALL" ? "Toate" : STATUS_LABEL[tab]}
                 </button>
@@ -85,10 +85,10 @@ function Orders() {
           <tbody>
             {data?.items.length === 0 && <EmptyRow colSpan={6}>Nicio comandă.</EmptyRow>}
             {data?.items.map((o) => (
-              <tr key={o.id} onClick={() => router.push(`/comenzi/${o.id}`)} className="cursor-pointer hover:bg-zinc-50">
-                <Td className="tabular text-zinc-500">#{o.id}</Td>
+              <tr key={o.id} onClick={() => router.push(`/comenzi/${o.id}`)} className="cursor-pointer hover:bg-slate-50">
+                <Td className="tabular text-slate-500">#{o.id}</Td>
                 <Td className="font-medium">{o.customer.name}</Td>
-                <Td className="whitespace-nowrap text-zinc-600">{formatDateTime(o.createdAt)}</Td>
+                <Td className="whitespace-nowrap text-slate-600">{formatDateTime(o.createdAt)}</Td>
                 <Td className="tabular text-right">{o._count?.items}</Td>
                 <Td className="tabular whitespace-nowrap text-right">{formatMoney(o.total)}</Td>
                 <Td>

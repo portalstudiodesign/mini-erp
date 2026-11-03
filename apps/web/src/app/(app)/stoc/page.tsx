@@ -52,13 +52,13 @@ function MovementForm() {
   return (
     <Card title="Mișcare nouă">
       <form onSubmit={onSubmit} className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-1 rounded-md bg-zinc-100 p-1">
+        <div className="grid grid-cols-2 gap-1 rounded-md bg-slate-100 p-1">
           {(["RECEIPT", "ADJUSTMENT"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setType(t)}
-              className={`rounded px-3 py-1.5 text-sm ${type === t ? "bg-white font-medium shadow-xs" : "text-zinc-600"}`}
+              className={`rounded px-3 py-1.5 text-sm ${type === t ? "bg-white font-medium shadow-xs" : "text-slate-600"}`}
             >
               {MOVEMENT_LABEL[t]}
             </button>
@@ -131,7 +131,7 @@ export default function StockPage() {
 
       <div className={`grid gap-6 [&>*]:min-w-0 ${canWrite ? "lg:grid-cols-[1fr_20rem]" : ""}`}>
         <Card>
-          <div className="flex flex-wrap gap-3 border-b border-zinc-100 p-4">
+          <div className="flex flex-wrap gap-3 border-b border-slate-100 p-4">
             <Input
               placeholder="Produs sau SKU…"
               value={q}
@@ -172,10 +172,10 @@ export default function StockPage() {
               {movements.data?.items.length === 0 && <EmptyRow colSpan={5}>Nicio mișcare.</EmptyRow>}
               {movements.data?.items.map((m) => (
                 <tr key={m.id}>
-                  <Td className="whitespace-nowrap text-zinc-600">{formatDateTime(m.createdAt)}</Td>
+                  <Td className="whitespace-nowrap text-slate-600">{formatDateTime(m.createdAt)}</Td>
                   <Td>
                     <div className="font-medium">{m.product?.name}</div>
-                    <div className="font-mono text-xs text-zinc-500">{m.product?.sku}</div>
+                    <div className="font-mono text-xs text-slate-500">{m.product?.sku}</div>
                   </Td>
                   <Td>
                     <Badge tone={MOVEMENT_TONE[m.type]}>{MOVEMENT_LABEL[m.type]}</Badge>
@@ -184,7 +184,7 @@ export default function StockPage() {
                     {m.quantity > 0 ? "+" : ""}
                     {m.quantity}
                   </Td>
-                  <Td className="text-zinc-600">
+                  <Td className="text-slate-600">
                     {m.orderId ? (
                       <Link href={`/comenzi/${m.orderId}`} className="text-brand-700 hover:underline">
                         Comanda #{m.orderId}
@@ -192,7 +192,7 @@ export default function StockPage() {
                     ) : (
                       m.reason ?? "—"
                     )}
-                    <div className="text-xs text-zinc-400">{m.user.name}</div>
+                    <div className="text-xs text-slate-400">{m.user.name}</div>
                   </Td>
                 </tr>
               ))}
