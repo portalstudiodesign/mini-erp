@@ -67,7 +67,7 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
           Activ (poate fi adăugat în comenzi)
         </label>
       )}
-      <p className="text-xs text-zinc-500">Stocul nu se editează aici: se modifică doar prin recepții și corecții, din pagina Stoc.</p>
+      <p className="text-xs text-slate-500">Stocul nu se editează aici: se modifică doar prin recepții și corecții, din pagina Stoc.</p>
       {!Object.keys(errors).length && <ErrorBox error={save.error} />}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>
@@ -103,7 +103,7 @@ export default function ProductsPage() {
         action={canWrite && <Button onClick={() => setEditing("new")}>Produs nou</Button>}
       />
       <Card>
-        <div className="flex flex-wrap items-center gap-3 border-b border-zinc-100 p-4">
+        <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 p-4">
           <Input
             placeholder="Caută după denumire sau SKU…"
             value={q}
@@ -113,7 +113,7 @@ export default function ProductsPage() {
             }}
             className="max-w-xs"
           />
-          <label className="flex items-center gap-2 text-sm text-zinc-700">
+          <label className="flex items-center gap-2 text-sm text-slate-700">
             <input
               type="checkbox"
               checked={lowStock}
@@ -124,7 +124,7 @@ export default function ProductsPage() {
             />
             Doar sub stocul minim
           </label>
-          {isFetching && <span className="text-xs text-zinc-400">Se încarcă…</span>}
+          {isFetching && <span className="text-xs text-slate-400">Se încarcă…</span>}
         </div>
         <ErrorBox error={error} />
         <Table>
@@ -146,15 +146,15 @@ export default function ProductsPage() {
                 <tr
                   key={p.id}
                   onClick={() => canWrite && setEditing(p)}
-                  className={canWrite ? "cursor-pointer hover:bg-zinc-50" : undefined}
+                  className={canWrite ? "cursor-pointer hover:bg-slate-50" : undefined}
                 >
-                  <Td className="font-mono text-xs text-zinc-600">{p.sku}</Td>
+                  <Td className="font-mono text-xs text-slate-600">{p.sku}</Td>
                   <Td className="font-medium">{p.name}</Td>
                   <Td className="tabular text-right">{formatMoney(p.price)}</Td>
                   <Td className={`tabular text-right ${low ? "font-semibold text-red-600" : ""}`}>
-                    {p.stock} <span className="font-normal text-zinc-400">{p.unit}</span>
+                    {p.stock} <span className="font-normal text-slate-400">{p.unit}</span>
                   </Td>
-                  <Td className="tabular text-right text-zinc-500">{p.minStock}</Td>
+                  <Td className="tabular text-right text-slate-500">{p.minStock}</Td>
                   <Td>{p.active ? low ? <Badge tone="danger">Stoc mic</Badge> : <Badge tone="success">Activ</Badge> : <Badge>Inactiv</Badge>}</Td>
                 </tr>
               );

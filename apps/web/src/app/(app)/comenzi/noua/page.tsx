@@ -90,7 +90,7 @@ export default function NewOrderPage() {
         </Card>
 
         <Card title="Produse" action={<Button type="button" variant="secondary" onClick={() => setLines([...lines, newLine()])}>Adaugă rând</Button>}>
-          <div className="divide-y divide-zinc-100">
+          <div className="divide-y divide-slate-100">
             {lines.map((line, index) => {
               const product = productById.get(Number(line.productId));
               const overStock = product && Number(line.quantity) > product.stock;
@@ -114,7 +114,7 @@ export default function NewOrderPage() {
                     <Input type="number" min="1" value={line.quantity} onChange={(e) => updateLine(line.key, { quantity: e.target.value })} />
                   </Field>
                   <div className="space-y-1">
-                    <span className="text-sm font-medium text-zinc-700">Valoare</span>
+                    <span className="text-sm font-medium text-slate-700">Valoare</span>
                     <div className="tabular py-2 text-sm">{product ? formatMoney(Number(product.price) * Number(line.quantity || 0)) : "—"}</div>
                   </div>
                   <Button
@@ -131,8 +131,8 @@ export default function NewOrderPage() {
               );
             })}
           </div>
-          <div className="flex items-center justify-between border-t border-zinc-200 bg-zinc-50/60 px-4 py-3">
-            <span className="text-sm text-zinc-600">Total estimat (fără TVA)</span>
+          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50/60 px-4 py-3">
+            <span className="text-sm text-slate-600">Total estimat (fără TVA)</span>
             <span className="tabular text-lg font-semibold">{formatMoney(estimate)}</span>
           </div>
         </Card>
