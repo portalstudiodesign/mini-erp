@@ -1,88 +1,90 @@
-# Mini ERP: comenzi, stocuri, clienți
+# Mini ERP: orders, stock, customers
 
-Aplicație internă pentru un atelier care produce porți și garduri decupate laser: catalog de produse, clienți, comenzi cu flux de aprobare, stoc cu jurnal de mișcări și alerte automate de stoc minim.
+Internal app for a workshop that manufactures laser-cut gates and fences: product catalog, customers, orders with an approval workflow, stock with a movement ledger, and automatic low-stock alerts.
+
+The UI is in Romanian, since the target users are a Romanian business.
 
 **Stack:** Node.js · Express 5 · Prisma 7 · PostgreSQL · Next.js 16 · React 19 · TanStack Query · Tailwind 4 · BullMQ + Redis · Zod · Vitest + Supertest · Docker · GitHub Actions
 
 ```
 apps/
-  api/   Express + Prisma (REST, autentificare, roluri, joburi de fundal)
-  web/   Next.js (interfața)
+  api/   Express + Prisma (REST, authentication, roles, background jobs)
+  web/   Next.js (UI)
 ```
 
-## Pornire rapidă
+## Quick start
 
-### Totul în Docker
+### Everything in Docker
 
 ```bash
 docker compose up -d --build
-docker compose exec api node dist/seed.js   # date demo
+docker compose exec api node dist/seed.js   # demo data
 ```
 
-Aplicația: http://localhost:3000 · API: http://localhost:4000/api/health
+App: http://localhost:3000 · API: http://localhost:4000/api/health
 
-Pornește 5 containere: Postgres 17, Redis 7, API-ul (aplică migrările la pornire), workerul BullMQ și interfața Next.js.
+This starts 5 containers: Postgres 17, Redis 7, the API (applies migrations on startup), the BullMQ worker and the Next.js UI.
 
-### Dezvoltare locală
+### Local development
 
-Postgres și Redis rulează în Docker, iar codul rulează local, cu reîncărcare automată:
+Postgres and Redis run in Docker, the code runs locally with hot reload:
 
 ```bash
 npm install
 cp apps/api/.env.example apps/api/.env
-npm run dev:db                                  # Postgres + Redis în Docker
+npm run dev:db                                  # Postgres + Redis in Docker
 cd apps/api && npx prisma migrate deploy && npm run db:seed && cd ../..
 npm run dev:api                                 # terminal 2
 npm run dev:worker                              # terminal 3
 npm run dev:web                                 # terminal 4
 ```
 
-Fără `REDIS_URL` în `apps/api/.env`, joburile de fundal rulează direct în procesul API-ului și workerul nu mai e necesar.
+Without `REDIS_URL` in `apps/api/.env`, background jobs run inline in the API process and the worker isn't needed.
 
-### Conturi demo (parola `Demo1234!`)
+### Demo accounts (password `Demo1234!`)
 
-| Email | Rol | Ce poate face |
+| Email | Role | Can do |
 |---|---|---|
-| admin@demo.ro | Administrator | tot |
-| vanzari@demo.ro | Vânzări | clienți, creare / confirmare / anulare comenzi |
-| depozit@demo.ro | Depozit | recepții și corecții de stoc, expediere / livrare |
+| admin@demo.ro | Admin | everything |
+| vanzari@demo.ro | Sales | customers, create / confirm / cancel orders |
+| depozit@demo.ro | Warehouse | stock receipts and adjustments, ship / deliver orders |
 
-## Teste
+## Tests
 
 ```bash
 npm test
 ```
 
-Testele de integrare rulează pe Postgres real, într-o bază separată (`mini_erp_test`, vezi `apps/api/.env.test`), deci cer `npm run dev:db` pornit. Acoperă: autentificare, permisiuni pe rol, calculul totalului pe server, tranzacții, fluxul de status, alertele de stoc și **două confirmări simultane care concurează pe ultimele bucăți din stoc**.
+Integration tests run against a real Postgres, in a separate database (`mini_erp_test`, see `apps/api/.env.test`), so they need `npm run dev:db` running. They cover authentication, per-role permissions, server-side order totals, transactions, the status workflow, stock alerts and **two simultaneous confirmations competing for the last units in stock**.
 
-## Decizii de arhitectură
+## Architecture decisions
 
-**Organizare pe module** (`modules/orders`, `modules/stock` etc.), fiecare cu `routes` (HTTP), `schemas` (validare Zod) și `service` (logica de business + Prisma). Rutele sunt subțiri; logica se testează prin API, fără mock-uri de bază de date.
+**Module-based layout** (`modules/orders`, `modules/stock` etc.), each with `routes` (HTTP), `schemas` (Zod validation) and `service` (business logic + Prisma). Routes stay thin; logic is tested through the API, without database mocks.
 
-**Permisiuni, nu roluri, în rute.** `auth/permissions.ts` e singura sursă de adevăr (`"orders:approve": ["ADMIN", "SALES"]`). API-ul trimite lista de permisiuni la login, iar interfața ascunde butoanele pe baza ei; serverul verifică oricum fiecare cerere.
+**Permissions, not roles, in routes.** `auth/permissions.ts` is the single source of truth (`"orders:approve": ["ADMIN", "SALES"]`). The API sends the permission list on login and the UI hides buttons based on it; the server still checks every request.
 
-**Stocul nu se editează direct.** `Product.stock` se modifică doar prin `applyMovement()`, care scrie și un rând imuabil în `StockMovement`. Orice valoare de stoc poate fi explicată din jurnal.
+**Stock is never edited directly.** `Product.stock` changes only through `applyMovement()`, which also writes an immutable row to `StockMovement`. Any stock value can be explained from the ledger.
 
-**Fără stoc negativ, chiar și la cereri simultane.** Scăderea e un singur `UPDATE ... WHERE stock >= cantitate`. Dacă două comenzi confirmă ultimele bucăți în același timp, baza de date serializează cele două update-uri, iar al doilea nu găsește rândul și eșuează cu 409. Varianta „citesc stocul, verific în cod, apoi scriu” are o condiție de cursă.
+**No negative stock, even under concurrent requests.** The decrement is a single `UPDATE ... WHERE stock >= quantity`. If two orders confirm the last units at the same time, the database serializes the two updates; the second one matches no row and fails with 409. "Read stock, check in code, then write" has a race condition.
 
-**Blocare optimistă pe statusul comenzii.** Schimbarea de status e `UPDATE ... WHERE id = ? AND status = <statusul citit>`. Un dublu-click sau doi utilizatori care confirmă aceeași comandă nu scad stocul de două ori.
+**Optimistic locking on order status.** A status change is `UPDATE ... WHERE id = ? AND status = <status that was read>`. A double click, or two users confirming the same order, can't decrement stock twice.
 
-**Fără deadlock-uri.** Produsele unei comenzi sunt blocate mereu în ordinea `productId`, deci două comenzi cu aceleași produse nu se pot bloca reciproc.
+**No deadlocks.** An order's products are always locked in `productId` order, so two orders with the same products can't block each other.
 
-**Prețul vine din baza de date.** Clientul trimite doar `productId` și cantitatea; prețul unitar e copiat în `OrderItem` la momentul comenzii, așa că o scumpire ulterioară nu modifică comenzile vechi. Sumele sunt `Decimal(12,2)`, nu `float`.
+**Prices come from the database.** The client sends only `productId` and quantity; the unit price is copied into `OrderItem` when the order is placed, so a later price change doesn't alter old orders. Amounts are `Decimal(12,2)`, not `float`.
 
-**Joburi de fundal cu BullMQ.** După commit, API-ul pune în coadă o verificare de stoc minim pentru produsele atinse; workerul deschide sau închide alerte. Jobul are reîncercări cu backoff exponențial, iar o verificare completă rulează zilnic la 7:00. Fără Redis, același cod rulează sincron, ca proiectul să pornească fără infrastructură.
+**Background jobs with BullMQ.** After commit, the API enqueues a low-stock check for the affected products; the worker opens or resolves alerts. The job retries with exponential backoff, and a full check runs daily at 07:00. Without Redis the same code runs synchronously, so the project starts with no extra infrastructure.
 
-**Cel mult o alertă deschisă per produs, garantat de baza de date.** Joburile rulează în paralel (și pot veni din procese diferite), deci o verificare „există deja alertă?” urmată de insert ar crea duplicate. `StockAlert.openFor` e egal cu `productId` cât timp alerta e deschisă și `NULL` după rezolvare. Coloana e unică, iar Postgres nu consideră NULL-urile duplicate, deci a doua alertă deschisă e respinsă de index, iar jobul tratează eroarea ca „deja făcut”.
+**At most one open alert per product, enforced by the database.** Jobs run in parallel (and can come from different processes), so an "is there already an alert?" check followed by an insert would create duplicates. `StockAlert.openFor` equals `productId` while the alert is open and `NULL` once resolved. The column is unique and Postgres doesn't treat NULLs as duplicates, so a second open alert is rejected by the index and the job treats the error as "already done".
 
-**Sesiune în cookie httpOnly**, nu în `localStorage`: JavaScript-ul din pagină nu poate citi tokenul. Next.js face proxy la `/api`, deci cookie-ul e first-party și nu e nevoie de CORS. Utilizatorul e reîncărcat din DB la fiecare request, așa că dezactivarea unui cont are efect imediat.
+**Session in an httpOnly cookie**, not `localStorage`: page JavaScript can't read the token. Next.js proxies `/api`, so the cookie is first-party and CORS isn't needed. The user is reloaded from the DB on every request, so deactivating an account takes effect immediately.
 
-**Erori consecvente.** Orice eroare are forma `{ error: { code, message, details } }`; erorile Zod devin 400 cu câmpurile greșite, pe care formularele le afișează lângă input.
+**Consistent errors.** Every error has the shape `{ error: { code, message, details } }`; Zod errors become 400 with the invalid fields, which forms show next to the inputs.
 
-## Ce aș adăuga într-un proiect real
+## What I'd add in a real project
 
-- pachet comun pentru schemele Zod și tipuri, folosit și de API și de interfață;
-- teste end-to-end cu Playwright pe fluxul comandă → confirmare → expediere;
-- documentație OpenAPI generată din schemele Zod;
-- facturare (e-Factura), integrare cu un curier (AWB), export Excel;
-- audit log pentru modificările de produse și clienți.
+- a shared package for Zod schemas and types, used by both the API and the UI;
+- Playwright end-to-end tests for the order → confirm → ship flow;
+- OpenAPI docs generated from the Zod schemas;
+- invoicing (Romanian e-Factura), courier integration (shipping labels), Excel export;
+- an audit log for product and customer changes.
