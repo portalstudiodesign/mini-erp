@@ -1,0 +1,9 @@
+node_modules
+.env
+.env.local
+dist
+.next
+apps/api/src/generated
+coverage
+playwright-report
+test-results
